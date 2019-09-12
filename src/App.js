@@ -1,25 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect,useReducer } from  'react';
 import './App.css';
+import Header from './components/Header'
+import Login from './components/Login'
+import Home from './components/Home'
+import { AuthContext } from './context/AuthContext'
 
-function App() {
+
+const App = () => {
+  const initialState = {
+    isAuthenticated: false,
+    user: null,
+    token: null
+  }
+
+  const reducer = (state,action) => {
+    switch (action.type) {
+      case 'LOGIN':
+        return{
+          ...state,
+          isAuthenticated: true,
+          user: action.payload.user,
+          token: action.payload.token
+        }
+      case 'LOGOUT':
+        return{
+          ...state,
+          isAuthenticated: false,
+          user: null,
+          token: null
+        }
+      default:
+        return state;
+    }
+  }
+
+  const [state,dispatch] = useReducer(reducer,initialState);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthContext.Provider value={{state,dispatch}}>
+       <Header/>
+       <div className="App">
+         {state.isAuthenticated ? <Home/> : <Login/>}
+       </div>
+    </AuthContext.Provider>
   );
 }
 
